@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from account import *
+from acount import *
 
 DISTRICT_C = [u'浦东', u'闵行', u'宝山', u'徐汇', u'普陀', u'杨浦', u'长宁', u'松江', u'嘉定',
               u'黄浦', u'静安', u'闸北', u'虹口', u'青浦', u'奉贤', u'金山', u'崇明', u'上海周边']

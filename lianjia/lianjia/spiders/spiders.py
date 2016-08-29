@@ -27,6 +27,7 @@ class MySpider(scrapy.Spider):
     def log_in(self, response):
         jsessionID_regex = re.compile(JSESSIONID)
         jsessionID = jsessionID_regex.match(response.headers['Set-Cookie']).group()
+        print 'jsessionID: ', jsessionID
         body_bs = bs(response.body, 'lxml')
         user_logn = body_bs.find('ul', class_="user-logn")
         hidden_input = user_logn.find_all('input', type='hidden')
@@ -34,14 +35,13 @@ class MySpider(scrapy.Spider):
         execution = hidden_input[1]['value']
 
         header = HEADER_LOGIN
-        header['Cookie'] = [jsessionID]
         form = FORM_DATA
         form['execution'] = execution
         form['lt'] = lt
 
         response_with_cookies = scrapy.Request(url=self.start_urls[0],
                                                headers=header,
-                                               # cookies=jsessionID
+                                               cookies=jsessionID
                                                )
 
         print '+' * 100
