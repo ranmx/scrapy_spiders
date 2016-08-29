@@ -1,0 +1,36 @@
+def log_in(self, response):
+    jsessionID_regex = re.compile(JSESSIONID)
+    jsessionID = 'JSESSIONIS=' + str(jsessionID_regex.match(response.headers['Set-Cookie']).group)
+    body_bs = bs(response.body)
+    user_logn = body_bs.find('ul', class_="user-logn")
+    hidden_input = user_logn.find_all('input', type='hidden')
+    lt = hidden_input[0]['value']
+    execution = hidden_input[1]['value']
+
+    header = HEADER_LOGIN
+    # header['Cookie'] = jsessionID
+    form = FORM_DATA
+    form['execution'] = execution
+    form['lt'] = lt
+
+    response_with_cookies = scrapy.Request(url=self.start_urls[0],
+                                           headers=header
+    cookies ==
+    )
+
+    print '-' * 40
+    print response_with_cookies.body
+    print '-' * 40
+
+    # scrapy.FormRequest.from_response(
+    #    response_with_cookies,
+    #    headers=header,
+    #    formdata=form,
+    #    callback=self.after_login
+    # )
+
+
+def after_login(self, response):
+    print '-' * 40
+    print type(response)
+    print '-' * 40
