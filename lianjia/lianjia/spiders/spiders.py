@@ -2,6 +2,7 @@
 import scrapy
 from scrapy.crawler import CrawlerProcess
 from scrapy.contrib.spiders import CrawlSpider, Rule
+import lianjia.settings
 from scrapy.http import Request
 from scrapy.http import FormRequest
 from bs4 import BeautifulSoup as bs
@@ -12,22 +13,23 @@ from lianjia.config import *
 import re
 
 
-class MySpider(scrapy.Spider):
-    name = "lianjiaershou"
+class MySpider(CrawlSpider):
+    name = "spider"
     allowed_domains = ["http://sh.lianjia.com"]
     start_urls = ['https://passport.lianjia.com/cas/login?service=http://user.sh.lianjia.com/index/ershou']
-    header_login = HEADER_START
 
     def parse(self, response):
-        print '=' * 100
+        print '=' * 40 + 'response meta' + '=' * 40
         print response.meta
         print '=' * 100
         self.log_in(response)
 
     def log_in(self, response):
+        cookies = []
         jsessionID_regex = re.compile(JSESSIONID)
-        jsessionID = jsessionID_regex.match(response.headers['Set-Cookie']).group()
-        print 'jsessionID: ', jsessionID
+        jsessionID = jsessionID_regex.search(response.headers['Set-Cookie']).groups()[0]
+        cookies.append({'JSESSIONID': jsessionID})
+
         body_bs = bs(response.body, 'lxml')
         user_logn = body_bs.find('ul', class_="user-logn")
         hidden_input = user_logn.find_all('input', type='hidden')
@@ -39,40 +41,18 @@ class MySpider(scrapy.Spider):
         form['execution'] = execution
         form['lt'] = lt
 
-        response_with_cookies = scrapy.Request(url=self.start_urls[0],
-                                               headers=header,
-                                               cookies=jsessionID
-                                               )
-
-        print '+' * 100
-        print response_with_cookies.body
-        print '+' * 100
-        print form
-
         scrapy.FormRequest(
-           url=self.start_urls[0],
-           headers=header,
-           formdata=form,
-           callback=self.after_login
-        )
+            url=self.start_urls[0],
+            headers=header,
+            cookies=cookies,
+            formdata=form,
+            callback=self.after_login
+            )
 
     def after_login(self, response):
-        print '=' * 100
+        print '=' * 40 + 'after login' + '=' * 40
         print response.headers
         print '=' * 100
-
-
-process = CrawlerProcess({
-'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
-})
-process.create_crawler(MySpider)
-process.start()
-
-
-
-
-
-
 
 
 
