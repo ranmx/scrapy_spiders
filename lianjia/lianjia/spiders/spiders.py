@@ -15,20 +15,22 @@ import re
 
 class MySpider(CrawlSpider):
     name = "spider"
-    allowed_domains = ["http://sh.lianjia.com"]
-    start_urls = ['https://passport.lianjia.com/cas/login?service=http://user.sh.lianjia.com/index/ershou']
+    allowed_domains = ["sh.lianjia.com", "lianjia.com", "passport.lianjia.com"]
+    start_url = 'https://passport.lianjia.com/cas/login?service=http://user.sh.lianjia.com/index/ershou'
 
-    def parse(self, response):
-        print '=' * 40 + 'response meta' + '=' * 40
-        print response.meta
-        print '=' * 100
-        self.log_in(response)
+    def start_requests(self):
+        yield Request(self.start_url,
+                      meta={'cookiejar': 1},
+                      callback=self.get_form
+                      )
 
-    def log_in(self, response):
-        cookies = []
+    def get_form(self, response):
+        cookies = {}
         jsessionID_regex = re.compile(JSESSIONID)
         jsessionID = jsessionID_regex.search(response.headers['Set-Cookie']).groups()[0]
-        cookies.append({'JSESSIONID': jsessionID})
+        cookies['JSESSIONID'] = jsessionID
+        cookies['Path'] = '/cas/'
+        cookies['HttpOnly'] = 'true'
 
         body_bs = bs(response.body, 'lxml')
         user_logn = body_bs.find('ul', class_="user-logn")
@@ -36,18 +38,32 @@ class MySpider(CrawlSpider):
         lt = hidden_input[0]['value']
         execution = hidden_input[1]['value']
 
-        header = HEADER_LOGIN
-        form = FORM_DATA
-        form['execution'] = execution
-        form['lt'] = lt
+        print '=' * 40 + 'get_form' + '=' * 40
+        print cookies
+        print '=' * 100
 
-        scrapy.FormRequest(
-            url=self.start_urls[0],
-            headers=header,
-            cookies=cookies,
-            formdata=form,
-            callback=self.after_login
-            )
+        request_with_cookies = Request(url=self.start_url,
+                                       cookies=cookies,
+                                       callback=self.login,
+                                       dont_filter=True
+                                       )
+        request_with_cookies.meta['execution'] = execution
+        request_with_cookies.meta['lt'] = lt
+        return request_with_cookies
+
+    def login(self, response):
+        form = FORM_DATA
+        form['execution'] = response.meta['execution']
+        form['lt'] = response.meta['lt']
+        print '=' * 40 + 'login' + '=' * 40
+        print form
+        print '=' * 100
+        return FormRequest.from_response(
+              response,
+              formdata=form,
+              headers=HEADER_LOGIN,
+              callback=self.after_login
+              )
 
     def after_login(self, response):
         print '=' * 40 + 'after login' + '=' * 40

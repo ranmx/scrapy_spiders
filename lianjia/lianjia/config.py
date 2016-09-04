@@ -6,28 +6,15 @@ DISTRICT_C = [u'浦东', u'闵行', u'宝山', u'徐汇', u'普陀', u'杨浦', 
 
 JSESSIONID = '(?:=)([^;]+)'
 
-
-HEADER_START = {
-    "Host": "passport.lianjia.com",
-    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.7,zh-CN;q=0.3",
-    "Accept-Encoding": "gzip, deflate, br",
-    'Referer': "https://passport.lianjia.com/cas/login?service=http://user.sh.lianjia.com/index/ershou",
-    "Connection": "keep-alive",
-    "Upgrade-Insecure-Requests": "1"
-}
-
-
 HEADER_LOGIN = {
     'Host': "passport.lianjia.com",
     'User-Agent': "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 Firefox/48.0",
     'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     'Accept-Language': "en-US,en;q=0.7,zh-CN;q=0.3",
     'Accept-Encoding': "gzip, deflate, br",
-    'Referer': "https://passport.lianjia.com/cas/login?service=http://user.sh.lianjia.com/index/ershou",
     'Connection': "keep-alive",
-    'Upgrade-Insecure-Requests': "1"
+    'Upgrade-Insecure-Requests': "1",
+    'service': "http://sh.lianjia.com/ershoufang/d1"
 }
 
 FORM_DATA = {
