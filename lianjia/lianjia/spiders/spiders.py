@@ -58,12 +58,15 @@ class MySpider(CrawlSpider):
         print '=' * 40 + 'login' + '=' * 40
         print form
         print '=' * 100
-        return FormRequest.from_response(
+        request = FormRequest.from_response(
               response,
               formdata=form,
               headers=HEADER_LOGIN,
-              callback=self.after_login
+              callback=self.after_login,
+              dont_filter=True,
               )
+        request.meta['dont_redirect'] = False
+        return request
 
     def after_login(self, response):
         print '=' * 40 + 'after login' + '=' * 40
